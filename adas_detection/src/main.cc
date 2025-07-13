@@ -330,7 +330,7 @@ vector<string> classes;
  if (model_type == 0) {
   classes = {"car", "person", "cycle"};
   max = 4;
- } else {
+ } if (model_type == 1) {
    max = 3;
    classes = {
   "person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train",
@@ -347,7 +347,30 @@ vector<string> classes;
   "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase",
   "scissors", "teddy bear", "hair drier", "toothbrush"
     };
- }
+  } else {
+      max = 3;
+      classes = { "aeroplane",
+"bicycle",
+"bird",
+"boat",
+"bottle",
+"bus",
+"car",
+"cat",
+"chair",
+"cow",
+"diningtable",
+"dog",
+"horse",
+"motorbike",
+"person",
+"pottedplant",
+"sheep",
+"sofa",
+"train",
+"tvmonitor"};
+  }    
+ 
 
   /* four output nodes of YOLO-v3 */
   // const string outputs_node[4] = {"layer81_conv", "layer93_conv",
@@ -596,6 +619,10 @@ int main(const int argc, const char** argv) {
   int outputCnt = outputTensors.size();
 
   LOG(INFO) << "input size: " << inputCnt << ", output size: " << outputCnt;
+auto outputs = runner->get_output_tensors();
+for (int i = 0; i < outputs.size(); ++i) {
+    LOG(INFO) << "Output " << i << ": " << outputs[i]->get_name() << std::endl;
+}
 
   // init the shape info
   TensorShape inshapes[inputCnt];
@@ -605,13 +632,14 @@ int main(const int argc, const char** argv) {
 
 
   if (model_type == 0) {
+    /* model yolov3 pruned*/
   getTensorShape(runner.get(), &shapes, inputCnt,
                  {"layer81", "layer93", "layer105", "layer117"});
-  } else {
+  }   else {
+    /* model yolov3 tf2 */
   getTensorShape(runner.get(), &shapes, inputCnt,
                  {"quant_conv2d_74_fix", "quant_conv2d_66_fix", "quant_conv2d_58_fix", /*"layer117"*/});
-  }
-
+  } 
 
   if (input_type == 0) {
     array<thread, 6> threadsList = {

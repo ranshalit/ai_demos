@@ -102,18 +102,25 @@ void detect(vector<vector<float>>& boxes, vector<float> result, int channel,
     classificationCnt = 3;
     anchorCnt = 5;
     biases = {123, 100, 167, 83, 98, 174, 165, 158, 347, 98,
-                       76,  37,  40,  97, 74, 64,  105, 63,  66,  131,
-                       18,  46,  33,  29, 47, 23,  28,  68,  52,  42,
-                       5.5, 7,   8,   17, 14, 11,  13,  29,  24,  17};
-  } else {
+                       76,  37,  40,  97, 74, 64,  105, 63,  66,  131, 
+                       18,  46,  33,  29, 47, 23,  28,  68,  52,  42,  
+                       5.5, 7,   8,   17, 14, 11,  13,  29,  24,  17}; 
+  } else  if (model_type == 1) {
     classificationCnt = 80;
     anchorCnt = 3;
     biases = {
-        10, 13, 16, 30, 33, 23,     // Anchors for Layer 0 (e.g., 52x52 grid)
-        30, 61, 62, 45, 59, 119,    // Anchors for Layer 1 (e.g., 26x26 grid)
-        116, 90, 156, 198, 373, 326 // Anchors for Layer 2 (e.g., 13x13 grid)
+        10, 13, 16, 30, 33, 23,     // Anchors for Layer 0 (e.g., 52x52 grid)  74
+        30, 61, 62, 45, 59, 119,    // Anchors for Layer 1 (e.g., 26x26 grid)  66 
+        116, 90, 156, 198, 373, 326 // Anchors for Layer 2 (e.g., 13x13 grid)  58
     };
-
+  } else {
+    classificationCnt = 20;
+    anchorCnt = 3;
+    biases = {
+        10, 13, 16, 30, 33, 23,     // Anchors for Layer 0 (e.g., 52x52 grid)  74
+        30, 61, 62, 45, 59, 119,    // Anchors for Layer 1 (e.g., 26x26 grid)  66 
+        116, 90, 156, 198, 373, 326 // Anchors for Layer 2 (e.g., 13x13 grid)  58
+    };
   }
 
   int conf_box = 5 + classificationCnt;
