@@ -1,43 +1,30 @@
 ## Reference
 
-Vitis-ai quick start:  
+Vitis-ai very important quick start:  
 [https://xilinx.github.io/Vitis-AI/3.0/html/docs/quickstart/mpsoc.html](https://xilinx.github.io/Vitis-AI/3.0/html/docs/quickstart/mpsoc.html)  
+[https://github.com/Xilinx/Vitis-AI/blob/v3.0/board\_setup/mpsoc/board\_setup\_mpsoc.rst](https://github.com/Xilinx/Vitis-AI/blob/v3.0/board_setup/mpsoc/board_setup_mpsoc.rst)  
+[https://github.com/Xilinx/Vitis-AI/tree/v3.0/examples/vai\_runtime](https://github.com/Xilinx/Vitis-AI/tree/v3.0/examples/vai_runtime)
+
+Vitis-ai github:  
 [https://github.com/Xilinx/Vitis-AI](https://github.com/Xilinx/Vitis-AI)  
 Usb3 install:  
 [https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18841729/DWC3+Xilinx+Linux+USB+driver](https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18841729/DWC3+Xilinx+Linux+USB+driver)
 
-## 
+## Pre-quisite
 
-## General Setup
-
-* Zcu102 board  
-* Camera usb3 \- fix switches as described  
-  [https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/1586626609/USB+Boot+example+using+ZCU102+Host+and+ZCU102+Device](https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/1586626609/USB+Boot+example+using+ZCU102+Host+and+ZCU102+Device)  
-  3 switches in total \- we had to change the defaults  
-  * J7 – 1-2 Open   
-  * J113 \- 1-2 Close  
-  * J110 \- 1-2 Close  
-* Once we connect a simple camera we can see in dmesg that it is detected  
-* SD card with image for zcu102 see above link  
-* Serial to usb  
-* Ethernet connection
-
-Note: we have 2 zcu102 with rev 1.1, yet on running examples on one of them it fails on failed fingerprints, i.e. 2 cores with correct finger print but the 3rd one has a fault finger print  
-TODO: should try to run \_optimize script see vitis-ai q\&a
-
-various examples:  
-1\. stability of image  
-2\. detect of target (person, car, etc)  
-3\. Tracking of objects
-
-## Simple utilities to check format and resolution
-
-Check resolution:  
-*ffprobe video/adas.webm*  
-convert video to tiff in 1920x1080 resolution:  
-*ffmpeg \-i \*.webm \-vf scale=1920:1080 output\_%04d.tiff*
-
-modify readfile in main.cc of adas\_detection
+* Clone SD card for your board, get images from  
+  [https://github.com/Xilinx/Vitis-AI/blob/v3.0/board\_setup/mpsoc/board\_setup\_mpsoc.rst](https://github.com/Xilinx/Vitis-AI/blob/v3.0/board_setup/mpsoc/board_setup_mpsoc.rst)  
+* Extract video image file into SD (from quick start)  
+  Download the [vitis\_ai\_runtime\_r3.0.0\_image\_video.tar.gz](https://www.xilinx.com/bin/public/openDownload?filename=vitis_ai_runtime_r3.0.0_image_video.tar.gz) from host to the target using scp  
+* (Optional) Download the model and extract to SD (didn’t need to do it \- it is already there)  
+* Download [DPUCZDX8G.tar.gz](http://DPUCZDX8G.tar.gz) and extract it and inspect the content  
+  Read prj/vitis/[Readme.rd](http://Readme.rd)  & prj.vivado/[readme.rd](http://readme.rd)  
+  This is the TRD for the creating of dpu.xclbin file in design (vitis v++) \!   
+* (Optional) Run `zynqmp_dpu_optimize.sh` to optimize board settings.  
+  The script runs automatically after the board boots up with the official image. But you can also find the `dpu_sw_optimize.tar.gz` in [DPUCZDX8G.tar.gz](http://DPUCZDX8G.tar.gz) (download it)  
+  cd \~/dpu\_sw\_optimize/zynqmp/  
+  ./zynqmp\_dpu\_optimize.sh  
+* Install petalinux 2022.2 
 
 ## Prepare docker
 
@@ -56,6 +43,40 @@ Enter docker using:
 sudo ./docker\_run.sh xilinx/vitis-ai-tensorflow2-gpu:latest  
 And then inside docker:  
 conda activate vitis-ai-tensorflow2
+
+## 
+
+## General Setup
+
+* Zcu102 board  
+* Camera usb3 \- fix switches as described  
+  [https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/1586626609/USB+Boot+example+using+ZCU102+Host+and+ZCU102+Device](https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/1586626609/USB+Boot+example+using+ZCU102+Host+and+ZCU102+Device)  
+  3 switches in total \- we had to change the defaults  
+  * J7 – 1-2 Open   
+  * J113 \- 1-2 Close  
+  * J110 \- 1-2 Close  
+* Once we connect a simple camera we can see in dmesg that it is detected  
+* SD card with image for zcu102 see above link  
+* Serial to usb  
+* Ethernet connection  
+* Set boot switch: booting from sd
+
+Note: we have 2 zcu102 with rev 1.1, yet on running examples on one of them it fails on failed fingerprints, i.e. 2 cores with correct finger print but the 3rd one has a fault finger print  
+TODO: should try to run \_optimize script see vitis-ai q\&a
+
+various examples:  
+1\. stability of image  
+2\. detect of target (person, car, etc)  
+3\. Tracking of objects
+
+## Simple utilities to check format and resolution
+
+Check resolution:  
+*ffprobe video/adas.webm*  
+convert video to tiff in 1920x1080 resolution:  
+*ffmpeg \-i \*.webm \-vf scale=1920:1080 output\_%04d.tiff*
+
+modify readfile in main.cc of adas\_detection
 
 ## Build application for AI model
 
@@ -187,13 +208,6 @@ input \= input / 255
 
 input node: 'image\_input:0'  
 output nodes: 'conv2d\_58:0', 'conv2d\_66:0', 'conv2d\_74:0'
-
-	wget https://image-net.org/data/ILSVRC/2012/ILSVRC2012\_img\_train.tar \--no-check-certificate  
-	wget https://image-net.org/data/ILSVRC/2012/ILSVRC2012\_img\_val.tar \--no-check-certificate
-
-cp code/gen\_data/val.txt data/validation/val.txt  
-cp code/gen\_data/val\_filenames.txt data/validation/val\_filenames.txt  
-cp code/gen\_data/ILSVRC2012\_validation\_ground\_truth.txt data/validation/ILSVRC2012\_validation\_ground\_truth.txt
 
 Evaluate accuracy of quant model (tf2)  
 To evaluate the quantized model after you have generated it (saved as ./quantized/quantized.h5), you can use the same eval.py script but with the quantized model path and the \--quant flag to indicate it's a quantized model.  
